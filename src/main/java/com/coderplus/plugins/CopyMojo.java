@@ -26,6 +26,7 @@ package com.coderplus.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -41,7 +42,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Copy files during build
- * 
+ *
  * @author <a href="aneesh@coderplus.com">Aneesh Joseph</a>
  * @since 1.0
  */
@@ -51,14 +52,14 @@ extends AbstractMojo
 {
 	/**
 	 * The file which has to be copied
-	 * 
+	 *
 	 * @since 1.0
 	 */
 	@Parameter( required = false )
 	private File sourceFile;
 	/**
 	 * The target file to which the file should be copied(this shouldn't be a directory but a file which does or does not exist)
-	 * 
+	 *
 	 * @since 1.0
 	 */
 	@Parameter( required = false )
@@ -66,7 +67,7 @@ extends AbstractMojo
 
 	/**
 	 * Collection of FileSets to work on (FileSet contains sourceFile and destinationFile). See <a href="./usage.html">Usage</a> for details.
-	 * 
+	 *
 	 * @since 1.0
 	 */
 	@Parameter( required = false )
@@ -136,14 +137,17 @@ extends AbstractMojo
 					getLog().info("No changes detected in "+srcFile.getAbsolutePath());
 					return;
 				}
-				FileUtils.copyFile(srcFile, destFile);
+				if(!destFile.getParentFile().exists()){
+					destFile.getParentFile().mkdirs();
+				}
+				//using jdk1.8 Files copy
+				Files.copy(srcFile.toPath(),destFile.toPath());
 				getLog().info("Copied "+ srcFile.getAbsolutePath()+ " to "+ destFile.getAbsolutePath());
 				buildContext.refresh(destFile);
 			} catch (IOException e) {
 				throw new MojoExecutionException("could not copy "+srcFile.getAbsolutePath()+" to "+destFile.getAbsolutePath());
 			}
 		}
-
 
 	}
 }
