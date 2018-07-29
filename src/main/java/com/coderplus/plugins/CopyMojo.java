@@ -27,6 +27,7 @@ package com.coderplus.plugins;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -141,11 +142,11 @@ extends AbstractMojo
 					destFile.getParentFile().mkdirs();
 				}
 				//using jdk1.8 Files copy
-				Files.copy(srcFile.toPath(),destFile.toPath());
+				Files.copy(srcFile.toPath(),destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				getLog().info("Copied "+ srcFile.getAbsolutePath()+ " to "+ destFile.getAbsolutePath());
 				buildContext.refresh(destFile);
 			} catch (IOException e) {
-				throw new MojoExecutionException("could not copy "+srcFile.getAbsolutePath()+" to "+destFile.getAbsolutePath());
+				throw new MojoExecutionException("could not copy "+srcFile.getAbsolutePath()+" to "+destFile.getAbsolutePath(),e);
 			}
 		}
 
